@@ -1,0 +1,2154 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AgriSense AI – Smart Farming Platform</title>
+<style>
+  :root {
+    --green: #16a34a;
+    --green-light: #22c55e;
+    --green-dark: #14532d;
+    --green-bg: #f0fdf4;
+    --blue: #3b82d4;
+    --blue-light: #60a5fa;
+    --purple: #7c5cd8;
+    --text: #1f2328;
+    --muted: #57606a;
+    --border: #e5e7eb;
+    --surface: #f7f8fa;
+    --white: #ffffff;
+    --card-bg: rgba(255,255,255,0.82);
+    --glass: rgba(255,255,255,0.18);
+    --glass-border: rgba(255,255,255,0.35);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text);
+    background: var(--white);
+    overflow-x: hidden;
+  }
+
+  /* ── KEYFRAMES ── */
+  @keyframes floatCloud {
+    0%   { transform: translateX(-120px); opacity: 0; }
+    10%  { opacity: 0.7; }
+    90%  { opacity: 0.7; }
+    100% { transform: translateX(110vw); opacity: 0; }
+  }
+  @keyframes windmill {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  @keyframes droneFloat {
+    0%,100% { transform: translateY(0) translateX(0); }
+    25%     { transform: translateY(-18px) translateX(30px); }
+    50%     { transform: translateY(-8px) translateX(60px); }
+    75%     { transform: translateY(-22px) translateX(30px); }
+  }
+  @keyframes particle {
+    0%   { transform: translateY(0) scale(1); opacity: 0.6; }
+    100% { transform: translateY(-80px) scale(0.3); opacity: 0; }
+  }
+  @keyframes pulse {
+    0%,100% { transform: scale(1); opacity: 1; }
+    50%     { transform: scale(1.06); opacity: 0.8; }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes wave {
+    0%,100% { transform: scaleY(1); }
+    50%     { transform: scaleY(0.55); }
+  }
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  @keyframes blink {
+    0%,100% { opacity: 1; }
+    50%     { opacity: 0; }
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(20,83,45,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 0 5%;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 62px;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 1.25rem; font-weight: 700; color: #fff;
+    text-decoration: none;
+  }
+  .nav-logo svg { width: 32px; height: 32px; }
+  .nav-links {
+    display: flex; gap: 6px; list-style: none;
+  }
+  .nav-links a {
+    color: rgba(255,255,255,0.82);
+    text-decoration: none;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+  }
+  .nav-links a:hover { background: rgba(255,255,255,0.13); color: #fff; }
+  .nav-badge {
+    background: var(--green-light);
+    color: var(--green-dark);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.03em;
+  }
+
+  /* ── HERO ── */
+  #hero {
+    position: relative;
+    min-height: 100vh;
+    background: linear-gradient(160deg, #052e16 0%, #14532d 35%, #166534 65%, #1a3a2a 100%);
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    padding-top: 62px;
+  }
+  /* Farmland SVG base */
+  .hero-ground {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 180px;
+    background: linear-gradient(to top, #052e16, #166534 60%, transparent);
+  }
+  /* Crop rows */
+  .crop-rows {
+    position: absolute; bottom: 50px; left: 0; right: 0;
+    display: flex; gap: 0; overflow: hidden; height: 120px;
+    align-items: flex-end;
+  }
+  .crop-stalk {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+    animation: wave 2.5s ease-in-out infinite;
+  }
+  .crop-stalk:nth-child(2n)   { animation-delay: 0.3s; }
+  .crop-stalk:nth-child(3n)   { animation-delay: 0.6s; }
+  .crop-stalk:nth-child(4n)   { animation-delay: 0.9s; }
+  .crop-stalk:nth-child(5n)   { animation-delay: 1.2s; }
+  .stalk-body { width: 3px; height: 70px; background: #22c55e; border-radius: 2px; }
+  .stalk-top  { width: 18px; height: 22px; background: #16a34a; border-radius: 50% 50% 40% 40%; }
+
+  /* Clouds */
+  .cloud {
+    position: absolute;
+    top: 15%;
+    width: 90px; height: 36px;
+    background: rgba(255,255,255,0.75);
+    border-radius: 50px;
+    animation: floatCloud linear infinite;
+  }
+  .cloud::before, .cloud::after {
+    content: '';
+    position: absolute;
+    background: rgba(255,255,255,0.75);
+    border-radius: 50%;
+  }
+  .cloud::before { width: 46px; height: 46px; top: -22px; left: 14px; }
+  .cloud::after  { width: 30px; height: 30px; top: -14px; right: 16px; }
+  .cloud-1 { animation-duration: 28s; animation-delay: 0s; top: 12%; }
+  .cloud-2 { animation-duration: 38s; animation-delay: -10s; top: 22%; width: 70px; height: 28px; }
+  .cloud-3 { animation-duration: 22s; animation-delay: -5s;  top: 8%;  width: 110px; height: 44px; }
+
+  /* Drone */
+  .drone {
+    position: absolute; top: 28%; right: 18%;
+    animation: droneFloat 6s ease-in-out infinite;
+  }
+  .drone svg { width: 64px; height: 64px; }
+
+  /* Windmill */
+  .windmill {
+    position: absolute; bottom: 100px; right: 8%;
+  }
+  .windmill-body { width: 12px; height: 90px; background: #d1d5db; margin: 0 auto; border-radius: 4px; }
+  .windmill-blades {
+    width: 60px; height: 60px;
+    position: absolute; top: -22px; left: 50%; transform-origin: center center;
+    transform: translateX(-50%);
+    animation: windmill 3s linear infinite;
+  }
+
+  /* Particles */
+  .particle {
+    position: absolute;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green-light);
+    animation: particle 4s ease-in infinite;
+  }
+
+  /* Hero content */
+  .hero-content {
+    position: relative; z-index: 10;
+    text-align: center; padding: 0 5%;
+    animation: fadeUp 1s ease both;
+  }
+  .hero-tag {
+    display: inline-block;
+    background: rgba(34,197,94,0.2);
+    border: 1px solid rgba(34,197,94,0.4);
+    color: #86efac;
+    font-size: 0.8rem; font-weight: 600;
+    padding: 5px 16px; border-radius: 20px; margin-bottom: 22px;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .hero-h1 {
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 800; color: #fff;
+    line-height: 1.15; margin-bottom: 18px;
+    letter-spacing: -0.02em;
+  }
+  .hero-h1 span { color: var(--green-light); }
+  .hero-sub {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: rgba(255,255,255,0.78);
+    max-width: 580px; margin: 0 auto 36px;
+  }
+  .hero-ctas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    padding: 13px 28px; border-radius: 12px;
+    font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; border: none; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: transform 0.15s, opacity 0.15s;
+  }
+  .btn:hover { transform: translateY(-2px); opacity: 0.92; }
+  .btn-primary { background: var(--green-light); color: var(--green-dark); }
+  .btn-outline {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.35);
+    color: #fff;
+    backdrop-filter: blur(8px);
+  }
+  .hero-stats {
+    display: flex; gap: 28px; justify-content: center; flex-wrap: wrap;
+    margin-top: 52px;
+  }
+  .hero-stat {
+    background: var(--glass); backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px; padding: 16px 26px;
+    color: #fff; text-align: center;
+    min-width: 110px;
+  }
+  .hero-stat .val { font-size: 1.8rem; font-weight: 800; color: var(--green-light); }
+  .hero-stat .lab { font-size: 0.78rem; color: rgba(255,255,255,0.7); margin-top: 2px; }
+
+  /* ── SECTIONS ── */
+  section { padding: 80px 5%; }
+  .section-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--green-bg);
+    color: var(--green);
+    font-size: 0.78rem; font-weight: 700;
+    padding: 5px 14px; border-radius: 20px;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 800; color: var(--text);
+    margin-bottom: 10px; letter-spacing: -0.02em;
+  }
+  .section-sub { color: var(--muted); max-width: 540px; margin-bottom: 40px; }
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 24px;
+  }
+  .card-green {
+    background: linear-gradient(135deg, #052e16 0%, #14532d 100%);
+    color: #fff; border: none;
+  }
+  .glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 24px;
+  }
+
+  /* ── AI CHAT SECTION ── */
+  #ai-advisor { background: var(--surface); }
+  .chat-layout {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start;
+  }
+  @media (max-width: 720px) { .chat-layout { grid-template-columns: 1fr; } }
+  .chat-window {
+    border: 1px solid var(--border); border-radius: 18px; overflow: hidden;
+    background: var(--white);
+  }
+  .chat-header {
+    background: linear-gradient(135deg, #052e16, #166534);
+    padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+  }
+  .chat-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--green-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+  }
+  .chat-title { color: #fff; font-weight: 700; font-size: 0.95rem; }
+  .chat-status { color: #86efac; font-size: 0.75rem; }
+  .chat-status::before {
+    content: '●'; margin-right: 5px;
+    animation: blink 1.5s ease-in-out infinite;
+  }
+  .chat-body { padding: 20px; min-height: 340px; display: flex; flex-direction: column; gap: 16px; }
+  .msg { display: flex; gap: 10px; align-items: flex-start; }
+  .msg.user { flex-direction: row-reverse; }
+  .msg-bubble {
+    max-width: 78%; padding: 12px 16px; border-radius: 14px;
+    font-size: 0.88rem; line-height: 1.5;
+  }
+  .msg.user .msg-bubble { background: var(--green); color: #fff; border-radius: 14px 4px 14px 14px; }
+  .msg.bot  .msg-bubble { background: var(--surface); border: 1px solid var(--border); border-radius: 4px 14px 14px 14px; }
+  .msg-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--green-bg); border: 2px solid var(--green-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem; flex-shrink: 0;
+  }
+  .disease-card {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border: 1px solid #bbf7d0; border-radius: 12px;
+    padding: 14px 16px; margin-top: 6px; font-size: 0.84rem;
+  }
+  .disease-name { font-weight: 800; color: var(--green-dark); font-size: 1rem; }
+  .conf-bar-wrap { margin: 8px 0; }
+  .conf-bar { height: 7px; border-radius: 10px; background: #e5e7eb; overflow: hidden; }
+  .conf-bar-fill { height: 100%; border-radius: 10px; background: var(--green); }
+  .reco-list { list-style: none; margin-top: 8px; }
+  .reco-list li { display: flex; gap: 6px; align-items: center; color: var(--green-dark); font-size: 0.83rem; padding: 3px 0; }
+  .reco-list li::before { content: '✔'; color: var(--green); font-weight: 700; }
+  .chat-input-row {
+    padding: 14px 16px; border-top: 1px solid var(--border);
+    display: flex; gap: 10px;
+  }
+  .chat-input {
+    flex: 1; padding: 10px 14px; border-radius: 10px;
+    border: 1px solid var(--border); font-size: 0.88rem; outline: none;
+    font-family: inherit;
+  }
+  .chat-send {
+    background: var(--green); color: #fff;
+    border: none; border-radius: 10px; padding: 10px 16px;
+    font-weight: 600; font-size: 0.88rem; cursor: pointer;
+  }
+
+  /* ai feature pills */
+  .ai-features { display: flex; flex-direction: column; gap: 16px; }
+  .ai-feat-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 14px; padding: 18px 20px;
+    display: flex; gap: 14px; align-items: flex-start;
+    transition: border-color 0.2s;
+  }
+  .ai-feat-card:hover { border-color: var(--green-light); }
+  .ai-feat-icon {
+    width: 42px; height: 42px; border-radius: 12px;
+    background: var(--green-bg); display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; flex-shrink: 0;
+  }
+  .ai-feat-title { font-weight: 700; font-size: 0.92rem; margin-bottom: 3px; }
+  .ai-feat-desc { font-size: 0.82rem; color: var(--muted); }
+
+  /* ── CROP SCAN ── */
+  #crop-scan { background: var(--white); }
+  .scan-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+  @media (max-width: 720px) { .scan-layout { grid-template-columns: 1fr; } }
+  .upload-zone {
+    border: 2px dashed var(--green);
+    border-radius: 18px; padding: 52px 24px;
+    text-align: center; background: var(--green-bg);
+    cursor: pointer;
+  }
+  .upload-icon { font-size: 3rem; margin-bottom: 12px; }
+  .upload-title { font-weight: 700; font-size: 1.05rem; color: var(--green-dark); margin-bottom: 6px; }
+  .upload-sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 18px; }
+  .upload-divider { color: var(--muted); font-size: 0.82rem; margin: 14px 0; }
+  .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .result-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px;
+  }
+  .result-item .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .result-item .value { font-size: 1rem; font-weight: 700; color: var(--text); }
+  .result-item .value.green { color: var(--green); }
+  .result-item .value.orange { color: #ea580c; }
+  .severity-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: 0.78rem; font-weight: 700;
+  }
+  .severity-medium { background: #fef3c7; color: #92400e; }
+  .severity-low    { background: #dcfce7; color: var(--green-dark); }
+  .severity-high   { background: #fee2e2; color: #991b1b; }
+
+  /* ── WEATHER ── */
+  #weather { background: var(--surface); }
+  .weather-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .weather-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px 16px; text-align: center;
+  }
+  .weather-icon { font-size: 2rem; margin-bottom: 8px; }
+  .weather-val { font-size: 1.6rem; font-weight: 800; color: var(--text); }
+  .weather-label { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+  .forecast-strip {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px 24px;
+    display: flex; gap: 0; overflow-x: auto;
+  }
+  .forecast-day {
+    flex: 1; min-width: 80px; text-align: center; padding: 12px 8px;
+    border-right: 1px solid var(--border);
+  }
+  .forecast-day:last-child { border-right: none; }
+  .forecast-day .day-name { font-size: 0.78rem; color: var(--muted); font-weight: 600; text-transform: uppercase; }
+  .forecast-day .day-icon { font-size: 1.6rem; margin: 8px 0; }
+  .forecast-day .day-temp { font-weight: 700; font-size: 0.92rem; }
+
+  /* ── SOIL ── */
+  #soil { background: var(--white); }
+  .soil-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; }
+  @media (max-width: 720px) { .soil-layout { grid-template-columns: 1fr; } }
+  .soil-metrics { display: flex; flex-direction: column; gap: 12px; }
+  .soil-row { display: flex; align-items: center; gap: 14px; }
+  .soil-name { width: 140px; font-weight: 600; font-size: 0.88rem; flex-shrink: 0; }
+  .soil-bar { flex: 1; height: 10px; background: #e5e7eb; border-radius: 10px; overflow: hidden; }
+  .soil-fill { height: 100%; border-radius: 10px; }
+  .soil-val { width: 60px; text-align: right; font-size: 0.82rem; color: var(--muted); font-weight: 600; }
+  .fill-green { background: var(--green); }
+  .fill-orange { background: #f97316; }
+  .fill-blue { background: #3b82f6; }
+  .soil-ph-card {
+    background: var(--green-bg); border: 1px solid #bbf7d0;
+    border-radius: 14px; padding: 20px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .ph-val { font-size: 2.2rem; font-weight: 800; color: var(--green-dark); }
+  .ai-reco-card {
+    background: linear-gradient(135deg, #052e16 0%, #166534 100%);
+    color: #fff; border-radius: 16px; padding: 22px;
+  }
+  .ai-reco-title { font-weight: 700; font-size: 0.92rem; margin-bottom: 12px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.05em; }
+  .ai-reco-list { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+  .ai-reco-list li { display: flex; gap: 8px; font-size: 0.88rem; align-items: center; }
+  .ai-reco-list li::before { content: '✔'; color: var(--green-light); font-weight: 700; }
+
+  /* ── ADVISOR ── */
+  #advisor { background: var(--surface); }
+  .advisor-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  @media (max-width: 720px) { .advisor-layout { grid-template-columns: 1fr; } }
+  .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .input-group { display: flex; flex-direction: column; gap: 5px; }
+  .input-group label { font-size: 0.78rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .input-group select, .input-group input {
+    padding: 10px 12px; border-radius: 10px;
+    border: 1px solid var(--border); font-size: 0.88rem;
+    background: var(--white); outline: none; font-family: inherit;
+  }
+  .output-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 8px; }
+  .out-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px;
+  }
+  .out-card .out-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+  .out-card .out-val { font-size: 1.05rem; font-weight: 800; color: var(--text); }
+  .out-card .out-val.big { font-size: 1.3rem; color: var(--green); }
+  .risk-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; background: #dcfce7; color: var(--green-dark); }
+
+  /* ── IRRIGATION ── */
+  #irrigation { background: var(--white); }
+  .irr-timeline { display: flex; flex-direction: column; gap: 0; }
+  .irr-step {
+    display: flex; gap: 0; align-items: stretch;
+  }
+  .irr-dot-col {
+    display: flex; flex-direction: column; align-items: center; width: 36px; flex-shrink: 0;
+  }
+  .irr-dot {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--green); border: 3px solid #fff;
+    box-shadow: 0 0 0 2px var(--green);
+    flex-shrink: 0; margin-top: 4px;
+  }
+  .irr-line { flex: 1; width: 2px; background: #e5e7eb; margin-top: 4px; min-height: 30px; }
+  .irr-content {
+    flex: 1; padding: 4px 0 22px 14px;
+  }
+  .irr-day { font-size: 0.75rem; color: var(--muted); font-weight: 600; text-transform: uppercase; }
+  .irr-action { font-weight: 700; font-size: 0.95rem; color: var(--text); }
+  .irr-tag {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: 0.75rem; font-weight: 600; margin-top: 5px;
+  }
+  .irr-tag-water  { background: #dbeafe; color: #1e40af; }
+  .irr-tag-none   { background: #f3f4f6; color: #6b7280; }
+  .irr-tag-light  { background: #e0f2fe; color: #0369a1; }
+  .irr-tag-fert   { background: #fef3c7; color: #92400e; }
+  .irr-tag-deep   { background: #dbeafe; color: #1d4ed8; }
+
+  /* ── PEST ── */
+  #pest { background: var(--surface); }
+  .pest-layout { display: grid; grid-template-columns: auto 1fr; gap: 48px; align-items: start; }
+  @media (max-width: 720px) { .pest-layout { grid-template-columns: 1fr; } }
+  .pest-gauge {
+    width: 200px; height: 200px; position: relative;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .gauge-svg { width: 200px; height: 200px; transform: rotate(-90deg); }
+  .gauge-track { fill: none; stroke: #e5e7eb; stroke-width: 16; }
+  .gauge-fill  { fill: none; stroke: var(--green); stroke-width: 16; stroke-linecap: round;
+                  stroke-dasharray: 502; stroke-dashoffset: 412; }
+  .gauge-label {
+    position: absolute; text-align: center;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+  }
+  .gauge-title { font-size: 0.72rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+  .gauge-val { font-size: 2rem; font-weight: 800; color: var(--green-dark); }
+  .gauge-level { font-size: 0.78rem; font-weight: 700; color: var(--green); }
+  .pest-alerts { display: flex; flex-direction: column; gap: 12px; }
+  .pest-alert-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 18px;
+  }
+  .pest-name { font-weight: 700; font-size: 0.92rem; display: flex; gap: 10px; align-items: center; }
+  .pest-icon { font-size: 1.2rem; }
+  .pest-level {
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 0.78rem; font-weight: 700;
+  }
+  .level-low    { background: #dcfce7; color: var(--green-dark); }
+  .level-none   { background: #f3f4f6; color: #6b7280; }
+  .level-medium { background: #fef3c7; color: #92400e; }
+  .level-high   { background: #fee2e2; color: #991b1b; }
+
+  /* ── GOVT ── */
+  #govt { background: var(--white); }
+  .govt-search {
+    display: flex; gap: 12px; margin-bottom: 28px; flex-wrap: wrap;
+  }
+  .govt-search input {
+    flex: 1; min-width: 200px; padding: 12px 16px;
+    border: 1px solid var(--border); border-radius: 12px;
+    font-size: 0.92rem; outline: none; font-family: inherit;
+  }
+  .scheme-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
+  .scheme-tag {
+    padding: 7px 16px; border-radius: 20px;
+    border: 1px solid var(--border);
+    font-size: 0.82rem; font-weight: 600;
+    background: var(--white); cursor: pointer; color: var(--muted);
+    transition: all 0.2s;
+  }
+  .scheme-tag.active { background: var(--green); color: #fff; border-color: var(--green); }
+  .govt-result {
+    background: linear-gradient(135deg, #052e16 0%, #1a3a2a 100%);
+    color: #fff; border-radius: 18px; padding: 28px;
+  }
+  .govt-scheme-name { font-size: 1.3rem; font-weight: 800; margin-bottom: 16px; color: #86efac; }
+  .govt-info-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+  .govt-info-item {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px; padding: 14px 16px;
+  }
+  .govt-info-item .gi-label { font-size: 0.75rem; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: 0.05em; }
+  .govt-info-item .gi-val { font-weight: 700; font-size: 0.95rem; margin-top: 4px; }
+
+  /* ── MARKET ── */
+  #market { background: var(--surface); }
+  .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; margin-bottom: 28px; }
+  .market-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 16px; padding: 22px;
+  }
+  .market-crop { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
+  .market-price { font-size: 1.7rem; font-weight: 800; color: var(--text); margin: 6px 0; }
+  .market-trend { display: flex; align-items: center; gap: 6px; font-size: 0.83rem; font-weight: 600; }
+  .trend-up   { color: var(--green); }
+  .trend-down { color: #dc2626; }
+  .trend-flat { color: var(--muted); }
+  .market-conf { margin-top: 10px; }
+  .market-conf .conf-text { font-size: 0.75rem; color: var(--muted); margin-bottom: 4px; }
+  .market-reco-card {
+    background: linear-gradient(135deg, #052e16 0%, #14532d 100%);
+    color: #fff; border-radius: 16px; padding: 24px;
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; align-items: center;
+  }
+  @media (max-width: 600px) { .market-reco-card { grid-template-columns: 1fr; } }
+  .mreco-crop { font-size: 1.1rem; font-weight: 800; }
+  .mreco-action { font-size: 0.85rem; color: #86efac; margin-top: 4px; }
+  .mreco-val { font-size: 1.5rem; font-weight: 800; color: var(--green-light); }
+  .mreco-label { font-size: 0.78rem; color: rgba(255,255,255,0.6); }
+
+  /* ── MULTI-AGENT ── */
+  #agents { background: var(--white); }
+  .agents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; margin-bottom: 32px; }
+  .agent-card {
+    border-radius: 18px; padding: 24px; position: relative; overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .agent-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  }
+  .agent-crop::before  { background: var(--green); }
+  .agent-weather::before { background: var(--blue); }
+  .agent-pest::before  { background: #f97316; }
+  .agent-market::before { background: var(--purple); }
+  .agent-icon { font-size: 2rem; margin-bottom: 12px; }
+  .agent-name { font-weight: 800; font-size: 1rem; margin-bottom: 6px; }
+  .agent-status {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.75rem; font-weight: 700;
+    padding: 4px 10px; border-radius: 20px;
+    margin-bottom: 10px;
+  }
+  .status-active { background: #dcfce7; color: var(--green-dark); }
+  .status-active::before { content: '●'; animation: blink 1.5s infinite; color: var(--green); }
+  .agent-msg { font-size: 0.83rem; color: var(--muted); }
+  /* Decision summary */
+  .decision-card {
+    background: linear-gradient(135deg, #052e16 0%, #0f3d22 50%, #1a3a2a 100%);
+    color: #fff; border-radius: 20px; padding: 32px;
+    position: relative; overflow: hidden;
+  }
+  .decision-card::after {
+    content: '';
+    position: absolute; top: -40px; right: -40px;
+    width: 180px; height: 180px;
+    background: rgba(34,197,94,0.08);
+    border-radius: 50%;
+  }
+  .decision-header { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+  .decision-badge {
+    background: rgba(34,197,94,0.2); border: 1px solid rgba(34,197,94,0.4);
+    color: #86efac; padding: 5px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 700;
+  }
+  .decision-title { font-size: 1.2rem; font-weight: 800; }
+  .decision-points { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .decision-points li { display: flex; gap: 10px; align-items: flex-start; font-size: 0.92rem; }
+  .decision-points li::before { content: '→'; color: var(--green-light); font-weight: 700; flex-shrink: 0; }
+  .decision-profit {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 14px; padding: 18px 22px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .decision-profit .dp-label { font-size: 0.82rem; color: rgba(255,255,255,0.6); }
+  .decision-profit .dp-val { font-size: 1.8rem; font-weight: 800; color: var(--green-light); }
+
+  /* ── DASHBOARD ── */
+  #dashboard { background: var(--surface); }
+  .dash-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 22px; }
+  @media (max-width: 900px) { .dash-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .dash-grid { grid-template-columns: 1fr; } }
+  .dash-card { background: var(--white); border: 1px solid var(--border); border-radius: 18px; padding: 22px; }
+  .dash-card-title { font-size: 0.78rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; }
+  /* Health bar */
+  .health-bar-wrap { margin-bottom: 16px; }
+  .health-bar-label { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px; }
+  .health-bar { height: 12px; background: #e5e7eb; border-radius: 10px; overflow: hidden; }
+  .health-fill { height: 100%; border-radius: 10px; background: linear-gradient(90deg, var(--green-light), var(--green)); }
+  /* Expense list */
+  .expense-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
+  .expense-row:last-child { border-bottom: none; }
+  /* KPI card */
+  .kpi-card { background: var(--white); border: 1px solid var(--border); border-radius: 18px; padding: 22px; text-align: center; }
+  .kpi-val { font-size: 1.9rem; font-weight: 800; margin-bottom: 6px; }
+  .kpi-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* ── IBM AI ── */
+  #ibm { background: linear-gradient(160deg, #0f0f23 0%, #0d1b2a 50%, #0a1628 100%); }
+  .ibm-title { color: #fff; }
+  .ibm-sub { color: rgba(255,255,255,0.55); }
+  .ibm-label { background: rgba(59,130,212,0.2); color: #93c5fd; border: 1px solid rgba(59,130,212,0.3); }
+  .ibm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px; margin-bottom: 36px; }
+  .ibm-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px; padding: 24px;
+    text-align: center; color: #fff;
+  }
+  .ibm-card:hover { border-color: rgba(59,130,212,0.5); }
+  .ibm-card-icon { font-size: 2.2rem; margin-bottom: 12px; }
+  .ibm-card-name { font-weight: 800; font-size: 1rem; margin-bottom: 6px; }
+  .ibm-card-desc { font-size: 0.8rem; color: rgba(255,255,255,0.5); }
+  /* Workflow */
+  .workflow-strip {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px; padding: 28px 32px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0; justify-content: center;
+  }
+  .wf-step {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 0 12px; min-width: 90px; text-align: center;
+  }
+  .wf-icon {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3);
+    display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+  }
+  .wf-label { font-size: 0.72rem; color: rgba(255,255,255,0.6); font-weight: 600; }
+  .wf-arrow { color: rgba(255,255,255,0.25); font-size: 1.1rem; margin: 0 4px; }
+
+  /* ── TECH STACK ── */
+  #tech { background: var(--surface); }
+  .tech-cols { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+  .tech-col { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 22px; }
+  .tech-col-title { font-weight: 800; font-size: 0.88rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--green); margin-bottom: 14px; }
+  .tech-pill {
+    display: inline-block; padding: 5px 12px; border-radius: 20px;
+    background: var(--green-bg); color: var(--green-dark);
+    font-size: 0.8rem; font-weight: 600; margin: 4px 4px 0 0;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border); padding: 28px 5%;
+    text-align: center; color: var(--muted); font-size: 0.78rem;
+    background: var(--white);
+  }
+  footer a { color: var(--green); text-decoration: none; }
+
+  /* responsive nav */
+  @media (max-width: 760px) {
+    .nav-links { display: none; }
+    .nav-links.open {
+      display: flex; flex-direction: column;
+      position: fixed; top: 62px; left: 0; right: 0;
+      background: rgba(5,46,22,0.98);
+      backdrop-filter: blur(12px);
+      padding: 18px 5% 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      gap: 4px; z-index: 99;
+    }
+    .nav-links.open a { padding: 11px 14px; border-radius: 8px; color: rgba(255,255,255,0.9); display: block; }
+  }
+  .hamburger-btn {
+    display: none; background: none; border: none;
+    cursor: pointer; padding: 8px; color: #fff;
+  }
+  @media (max-width: 760px) { .hamburger-btn { display: flex; flex-direction: column; gap: 5px; } }
+  .hamburger-btn span { width: 22px; height: 2px; background: #fff; border-radius: 2px; display: block; transition: 0.2s; }
+
+  /* quick reply chips */
+  .quick-chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 20px 14px; }
+  .chip {
+    padding: 6px 14px; border-radius: 20px; font-size: 0.8rem;
+    border: 1px solid var(--green-light); color: var(--green-dark);
+    background: var(--green-bg); cursor: pointer; font-family: inherit;
+    transition: background 0.15s;
+  }
+  .chip:hover { background: var(--green); color: #fff; border-color: var(--green); }
+
+  /* typing indicator */
+  .typing { display: flex; align-items: center; gap: 5px; padding: 12px 16px; }
+  .typing-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); animation: typingBounce 1.2s ease-in-out infinite; }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typingBounce { 0%,80%,100% { transform: scale(0.7); opacity: 0.5; } 40% { transform: scale(1); opacity: 1; } }
+
+  /* scroll-reveal */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.65s ease, transform 0.65s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* hero stat counter */
+  .hero-stat .val { transition: none; }
+</style>
+</head>
+<body>
+
+
+<nav id="main-nav">
+  <a class="nav-logo" href="#hero">
+    <svg fill="none">
+      <circle cx="16" cy="16" r="16" fill="#16a34a"></circle>
+      <path d="M8 22 Q12 10 16 14 Q20 18 24 8" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"></path>
+      <circle cx="16" cy="14" r="3" fill="#fff" opacity="0.9"></circle>
+    </svg>
+    AgriSense AI
+  </a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#ai-advisor">AI Advisor</a></li>
+    <li><a href="#crop-scan">Crop Scan</a></li>
+    <li><a href="#weather">Weather</a></li>
+    <li><a href="#market">Market</a></li>
+    <li><a href="#dashboard">Dashboard</a></li>
+    <li><a href="#ibm">About</a></li>
+    <li><span class="nav-badge">LIVE</span></li>
+  </ul>
+  <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+
+<section id="hero">
+  
+  <div class="hero-ground"></div>
+  
+  <div class="crop-rows" id="cropRows"></div>
+  
+  <div class="cloud cloud-1"></div>
+  <div class="cloud cloud-2"></div>
+  <div class="cloud cloud-3"></div>
+  
+  <div class="windmill">
+    <svg class="windmill-blades">
+      <line x1="30" y1="30" x2="30" y2="4" stroke="#9ca3af" stroke-width="5" stroke-linecap="round"></line>
+      <line x1="30" y1="30" x2="51" y2="44" stroke="#9ca3af" stroke-width="5" stroke-linecap="round"></line>
+      <line x1="30" y1="30" x2="9" y2="44" stroke="#9ca3af" stroke-width="5" stroke-linecap="round"></line>
+      <circle cx="30" cy="30" r="4" fill="#6b7280"></circle>
+    </svg>
+    <div class="windmill-body"></div>
+  </div>
+  
+  <div class="drone">
+    <svg fill="none">
+      <rect x="20" y="28" width="24" height="10" rx="5" fill="#e5e7eb"></rect>
+      <rect x="26" y="24" width="12" height="16" rx="3" fill="#d1d5db"></rect>
+      <circle cx="16" cy="24" r="6" fill="none" stroke="#9ca3af" stroke-width="2"></circle>
+      <circle cx="48" cy="24" r="6" fill="none" stroke="#9ca3af" stroke-width="2"></circle>
+      <circle cx="16" cy="40" r="6" fill="none" stroke="#9ca3af" stroke-width="2"></circle>
+      <circle cx="48" cy="40" r="6" fill="none" stroke="#9ca3af" stroke-width="2"></circle>
+      <line x1="16" y1="24" x2="26" y2="30" stroke="#9ca3af" stroke-width="1.5"></line>
+      <line x1="48" y1="24" x2="38" y2="30" stroke="#9ca3af" stroke-width="1.5"></line>
+      <line x1="16" y1="40" x2="26" y2="34" stroke="#9ca3af" stroke-width="1.5"></line>
+      <line x1="48" y1="40" x2="38" y2="34" stroke="#9ca3af" stroke-width="1.5"></line>
+      <circle cx="32" cy="22" r="3" fill="#22c55e"></circle>
+    </svg>
+  </div>
+  
+  <div id="particles"></div>
+
+  
+  <div class="hero-content">
+    <div class="hero-tag">🌾 Powered by IBM Granite · Langflow · Orchestrate</div>
+    <h1 class="hero-h1">
+      Grow Smarter.<br />
+      Harvest <span>Better.</span><br />
+      Powered by AI.
+    </h1>
+    <p class="hero-sub">
+      AgriSense AI combines weather intelligence, crop expertise, pest detection,
+      and market insights to help farmers make better decisions every day.
+    </p>
+    <div class="hero-ctas">
+      <a href="#ai-advisor" class="btn btn-primary">🟢 Start AI Advisor</a>
+      <a href="#crop-scan" class="btn btn-outline">📷 Scan Crop Disease</a>
+      <a href="#dashboard" class="btn btn-outline">📊 Open Dashboard</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="val">50K+</div><div class="lab">Farmers Served</div></div>
+      <div class="hero-stat"><div class="val">97%</div><div class="lab">AI Accuracy</div></div>
+      <div class="hero-stat"><div class="val">28+</div><div class="lab">Crop Types</div></div>
+      <div class="hero-stat"><div class="val">₹2.4Cr</div><div class="lab">Profit Generated</div></div>
+    </div>
+  </div>
+</section>
+
+
+<section id="ai-advisor">
+  <div class="container">
+    <div class="section-label">🤖 IBM Granite AI</div>
+    <h2 class="section-title">AI Crop Advisor</h2>
+    <p class="section-sub">Ask anything about your crops, pests, soil or market — powered by IBM Granite with multi-agent reasoning.</p>
+    <div class="chat-layout">
+      
+      <div class="chat-window">
+        <div class="chat-header">
+          <div class="chat-avatar">🌱</div>
+          <div>
+            <div class="chat-title">AgriSense AI</div>
+            <div class="chat-status">Online · IBM Granite</div>
+          </div>
+        </div>
+        <div class="chat-body">
+          <div class="msg user">
+            <div class="msg-avatar">👨‍🌾</div>
+            <div class="msg-bubble">My tomato leaves have white spots and yellowing edges. What is this?</div>
+          </div>
+          <div class="msg bot">
+            <div class="msg-avatar">🤖</div>
+            <div class="msg-bubble">
+              I've analyzed your description. Here's what I found:
+              <div class="disease-card">
+                <div class="disease-name">🦠 Powdery Mildew Detected</div>
+                <div class="conf-bar-wrap">
+                  <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:#57606a;margin-bottom:4px"><span>Confidence</span><span>96%</span></div>
+                  <div class="conf-bar"><div class="conf-bar-fill" style="width:96%"></div></div>
+                </div>
+                <ul class="reco-list">
+                  <li>Spray Sulfur Fungicide (0.3%)</li>
+                  <li>Reduce Humidity below 60%</li>
+                  <li>Remove infected leaves immediately</li>
+                  <li>Apply Neem Oil as preventive</li>
+                </ul>
+                <div style="margin-top:10px;font-size:0.8rem;color:#166534;font-weight:700">⏱ Expected Recovery: 7 Days</div>
+              </div>
+            </div>
+          </div>
+          <div class="msg user">
+            <div class="msg-avatar">👨‍🌾</div>
+            <div class="msg-bubble">Should I irrigate today? It looks cloudy.</div>
+          </div>
+          <div class="msg bot">
+            <div class="msg-avatar">🤖</div>
+            <div class="msg-bubble">
+              Weather Agent reports <strong>82% rain probability</strong> tomorrow. 
+              Do <strong>not irrigate today</strong> — wait for natural rainfall. 
+              Apply fertilizer 2 hours after rain for best absorption.
+            </div>
+          </div>
+        </div>
+        <div class="quick-chips" id="quick-chips">
+          <button class="chip">When to harvest?</button>
+          <button class="chip">Best fertilizer for Cotton?</button>
+          <button class="chip">Pest prevention tips</button>
+          <button class="chip">PM Kisan eligibility</button>
+        </div>
+        <div class="chat-input-row">
+          <input class="chat-input" id="chat-input" type="text" placeholder="Ask about your crop, soil, weather…" />
+          <button class="chat-send" id="chat-send">Send</button>
+        </div>
+      </div>
+      
+      <div class="ai-features">
+        <div class="ai-feat-card">
+          <div class="ai-feat-icon">🦠</div>
+          <div>
+            <div class="ai-feat-title">Disease Diagnosis</div>
+            <div class="ai-feat-desc">IBM Granite analyzes symptoms and image data to identify 200+ crop diseases with 96%+ accuracy.</div>
+          </div>
+        </div>
+        <div class="ai-feat-card">
+          <div class="ai-feat-icon">🌤</div>
+          <div>
+            <div class="ai-feat-title">Weather-Aware Advice</div>
+            <div class="ai-feat-desc">Real-time weather integration ensures irrigation, fertilizer, and harvest timing recommendations are always optimal.</div>
+          </div>
+        </div>
+        <div class="ai-feat-card">
+          <div class="ai-feat-icon">📋</div>
+          <div>
+            <div class="ai-feat-title">Government Schemes (RAG)</div>
+            <div class="ai-feat-desc">Retrieval-augmented generation over ICAR, PM Kisan, and Krishi Vigyan Kendra knowledge bases.</div>
+          </div>
+        </div>
+        <div class="ai-feat-card">
+          <div class="ai-feat-icon">📈</div>
+          <div>
+            <div class="ai-feat-title">Market Price Intelligence</div>
+            <div class="ai-feat-desc">Agmarknet live price feeds with AI-powered sell/hold recommendations and profit projections.</div>
+          </div>
+        </div>
+        <div class="ai-feat-card">
+          <div class="ai-feat-icon">🤝</div>
+          <div>
+            <div class="ai-feat-title">Multi-Agent Coordination</div>
+            <div class="ai-feat-desc">IBM Orchestrate synchronizes Crop, Weather, Pest, and Market agents for holistic daily farm decisions.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="crop-scan">
+  <div class="container">
+    <div class="section-label">📷 Computer Vision</div>
+    <h2 class="section-title">Crop Disease Scanner</h2>
+    <p class="section-sub">Upload a photo of your crop. AgriSense AI detects diseases, severity, and prescribes treatment instantly.</p>
+    <div class="scan-layout">
+      <div class="upload-zone" id="upload-zone">
+        <div class="upload-icon" id="upload-icon">📷</div>
+        <div class="upload-title">Upload Crop Image</div>
+        <div class="upload-sub">Drag &amp; Drop your crop photo here</div>
+        <div class="upload-divider">— or —</div>
+        <input type="file" id="file-input" accept="image/*" style="display:none" />
+        <button class="btn btn-primary" style="margin:0 auto" id="choose-image-btn">Choose Image</button>
+        <p style="margin-top:16px;font-size:0.78rem;color:#57606a">Supports JPG, PNG · Max 10MB · Powered by PlantVillage + IBM Vision AI</p>
+      </div>
+      <div>
+        <div style="background:#fef3c7;border:1px solid #fde68a;border-radius:14px;padding:14px 18px;margin-bottom:18px;font-size:0.85rem;color:#92400e;font-weight:600">
+          🔬 Sample Analysis — Leaf Blight Detected
+        </div>
+        <div class="result-grid">
+          <div class="result-item">
+            <div class="label">Disease</div>
+            <div class="value orange">Leaf Blight</div>
+          </div>
+          <div class="result-item">
+            <div class="label">Confidence</div>
+            <div class="value green">95%</div>
+          </div>
+          <div class="result-item">
+            <div class="label">Severity</div>
+            <div class="value"><span class="severity-badge severity-medium">Medium</span></div>
+          </div>
+          <div class="result-item">
+            <div class="label">Next Inspection</div>
+            <div class="value">3 Days</div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <div style="font-weight:700;margin-bottom:10px;font-size:0.92rem">💊 Recommended Treatment</div>
+          <div style="background:var(--green-bg);border:1px solid #bbf7d0;border-radius:10px;padding:12px 16px;font-size:0.88rem;color:var(--green-dark);font-weight:600;margin-bottom:12px">
+            Spray Copper Oxychloride 50% WP @ 3g/L water
+          </div>
+          <ul class="reco-list" style="gap:8px;display:flex;flex-direction:column">
+            <li>Apply in early morning or evening</li>
+            <li>Cover both sides of leaves uniformly</li>
+            <li>Repeat after 10 days if symptoms persist</li>
+            <li>Remove heavily infected plant parts</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="weather">
+  <div class="container">
+    <div class="section-label">☀ Smart Weather</div>
+    <h2 class="section-title">Weather Dashboard</h2>
+    <p class="section-sub">Hyperlocal weather data integrated with farm-specific irrigation and harvest decisions.</p>
+    <div class="weather-grid">
+      <div class="weather-card">
+        <div class="weather-icon">🌡</div>
+        <div class="weather-val">29°C</div>
+        <div class="weather-label">Temperature</div>
+      </div>
+      <div class="weather-card">
+        <div class="weather-icon">🌧</div>
+        <div class="weather-val">82%</div>
+        <div class="weather-label">Rain Probability</div>
+      </div>
+      <div class="weather-card">
+        <div class="weather-icon">💧</div>
+        <div class="weather-val">71%</div>
+        <div class="weather-label">Humidity</div>
+      </div>
+      <div class="weather-card">
+        <div class="weather-icon">🌬</div>
+        <div class="weather-val">11 km/h</div>
+        <div class="weather-label">Wind Speed</div>
+      </div>
+      <div class="weather-card">
+        <div class="weather-icon">☀</div>
+        <div class="weather-val" style="color:#f97316">High</div>
+        <div class="weather-label">UV Index</div>
+      </div>
+      <div class="weather-card">
+        <div class="weather-icon">🌡</div>
+        <div class="weather-val">31°C</div>
+        <div class="weather-label">Feels Like</div>
+      </div>
+    </div>
+    <div class="forecast-strip">
+      <div class="forecast-day">
+        <div class="day-name">Mon</div>
+        <div class="day-icon">☀</div>
+        <div class="day-temp">31°C</div>
+      </div>
+      <div class="forecast-day">
+        <div class="day-name">Tue</div>
+        <div class="day-icon">🌧</div>
+        <div class="day-temp">26°C</div>
+      </div>
+      <div class="forecast-day">
+        <div class="day-name">Wed</div>
+        <div class="day-icon">🌦</div>
+        <div class="day-temp">28°C</div>
+      </div>
+      <div class="forecast-day">
+        <div class="day-name">Thu</div>
+        <div class="day-icon">☀</div>
+        <div class="day-temp">33°C</div>
+      </div>
+      <div class="forecast-day">
+        <div class="day-name">Fri</div>
+        <div class="day-icon">🌩</div>
+        <div class="day-temp">24°C</div>
+      </div>
+      <div class="forecast-day">
+        <div class="day-name">Sat</div>
+        <div class="day-icon">☀</div>
+        <div class="day-temp">30°C</div>
+      </div>
+      <div class="forecast-day">
+        <div class="day-name">Sun</div>
+        <div class="day-icon">🌧</div>
+        <div class="day-temp">25°C</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="soil">
+  <div class="container">
+    <div class="section-label">🌱 Soil Intelligence</div>
+    <h2 class="section-title">Soil Health Analysis</h2>
+    <p class="section-sub">Real-time soil nutrient profiling via SoilGrids API with AI-driven amendment recommendations.</p>
+    <div class="soil-layout">
+      <div>
+        <div class="soil-metrics">
+          <div class="soil-row">
+            <div class="soil-name">Nitrogen (N)</div>
+            <div class="soil-bar"><div class="soil-fill fill-green" style="width:55%"></div></div>
+            <div class="soil-val" style="color:#16a34a">Medium</div>
+          </div>
+          <div class="soil-row">
+            <div class="soil-name">Phosphorus (P)</div>
+            <div class="soil-bar"><div class="soil-fill fill-orange" style="width:28%"></div></div>
+            <div class="soil-val" style="color:#f97316">Low</div>
+          </div>
+          <div class="soil-row">
+            <div class="soil-name">Potassium (K)</div>
+            <div class="soil-bar"><div class="soil-fill fill-blue" style="width:80%"></div></div>
+            <div class="soil-val" style="color:#3b82f6">High</div>
+          </div>
+          <div class="soil-row">
+            <div class="soil-name">Organic Carbon</div>
+            <div class="soil-bar"><div class="soil-fill fill-green" style="width:70%"></div></div>
+            <div class="soil-val" style="color:#16a34a">Good</div>
+          </div>
+          <div class="soil-row">
+            <div class="soil-name">Moisture</div>
+            <div class="soil-bar"><div class="soil-fill fill-blue" style="width:61%"></div></div>
+            <div class="soil-val">61%</div>
+          </div>
+        </div>
+        <div class="soil-ph-card" style="margin-top:22px">
+          <div style="font-size:0.75rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Soil pH</div>
+          <div class="ph-val">6.8 <span style="font-size:1rem;color:var(--green)">Optimal ✓</span></div>
+          <div style="font-size:0.82rem;color:var(--muted)">Ideal range for Cotton: 6.5 – 8.0</div>
+        </div>
+      </div>
+      <div class="ai-reco-card">
+        <div class="ai-reco-title">🤖 AI Soil Recommendations</div>
+        <ul class="ai-reco-list">
+          <li>Apply DAP @ 100 kg/acre</li>
+          <li>Reduce Urea application by 20%</li>
+          <li>Add Organic Compost (2 tonnes/acre)</li>
+          <li>Irrigate Tomorrow Morning</li>
+          <li>Test soil again after 30 days</li>
+          <li>Add Zinc Sulphate for micronutrients</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="advisor">
+  <div class="container">
+    <div class="section-label">👨‍🌾 Personalized AI</div>
+    <h2 class="section-title">Personalized Farming Advisor</h2>
+    <p class="section-sub">Tell us about your farm and IBM Orchestrate's multi-agent system generates a full season plan.</p>
+    <div class="advisor-layout">
+      <div class="card">
+        <div style="font-weight:700;margin-bottom:18px;font-size:1rem">📋 Your Farm Details</div>
+        <div class="input-grid">
+          <div class="input-group">
+            <label>Location</label>
+            <input type="text" />
+          </div>
+          <div class="input-group">
+            <label>Farm Size</label>
+            <input type="text" />
+          </div>
+          <div class="input-group">
+            <label>Primary Crop</label>
+            <select>
+              <option>Cotton</option>
+              <option>Wheat</option>
+              <option>Tomato</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Season</label>
+            <select>
+              <option>Kharif</option>
+              <option>Rabi</option>
+              <option>Zaid</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Water Source</label>
+            <select>
+              <option>Borewell</option>
+              <option>Canal</option>
+              <option>Rainwater</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Soil Type</label>
+            <select>
+              <option>Black Soil</option>
+              <option>Red Soil</option>
+              <option>Alluvial</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" id="gen-plan-btn" style="margin-top:20px;width:100%;justify-content:center">
+          🤖 Generate AI Farm Plan
+        </button>
+      </div>
+      <div>
+        <div style="background:linear-gradient(135deg,#052e16,#166534);border-radius:18px;padding:24px;color:#fff;margin-bottom:18px">
+          <div style="font-size:0.78rem;color:#86efac;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:14px">🤖 AI Output — IBM Granite</div>
+          <div class="output-cards">
+            <div style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:14px">
+              <div style="font-size:0.72rem;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:0.04em">Recommended Seed</div>
+              <div style="font-weight:800;font-size:0.95rem;margin-top:4px">Bt Cotton Hybrid</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:14px">
+              <div style="font-size:0.72rem;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:0.04em">Expected Yield</div>
+              <div style="font-weight:800;font-size:0.95rem;margin-top:4px;color:#86efac">30 Quintals</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:14px">
+              <div style="font-size:0.72rem;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:0.04em">Harvest Time</div>
+              <div style="font-weight:800;font-size:0.95rem;margin-top:4px">118 Days</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:14px">
+              <div style="font-size:0.72rem;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:0.04em">Profit Estimate</div>
+              <div style="font-weight:800;font-size:1.1rem;margin-top:4px;color:#86efac">₹1,92,000</div>
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:10px;align-items:center">
+            <div style="font-size:0.82rem;color:rgba(255,255,255,0.65)">Risk Level:</div>
+            <span style="background:#dcfce7;color:#14532d;padding:3px 12px;border-radius:20px;font-size:0.78rem;font-weight:700">🟢 Low</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="irrigation">
+  <div class="container">
+    <div class="section-label">💧 Smart Irrigation</div>
+    <h2 class="section-title">Irrigation Planner</h2>
+    <p class="section-sub">AI-optimized irrigation schedule based on soil moisture, weather forecast, and crop growth stage.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+      <div class="card">
+        <div style="font-weight:700;margin-bottom:20px">📅 8-Day Schedule</div>
+        <div class="irr-timeline">
+          <div class="irr-step">
+            <div class="irr-dot-col">
+              <div class="irr-dot" style="background:var(--blue);box-shadow:0 0 0 2px var(--blue-light)"></div>
+              <div class="irr-line"></div>
+            </div>
+            <div class="irr-content">
+              <div class="irr-day">Today · Day 1</div>
+              <div class="irr-action">💧 Full Irrigation</div>
+              <span class="irr-tag irr-tag-water">30mm water</span>
+            </div>
+          </div>
+          <div class="irr-step">
+            <div class="irr-dot-col">
+              <div class="irr-dot" style="background:#9ca3af;box-shadow:0 0 0 2px #d1d5db"></div>
+              <div class="irr-line"></div>
+            </div>
+            <div class="irr-content">
+              <div class="irr-day">Tomorrow · Day 2</div>
+              <div class="irr-action">⛅ No Irrigation</div>
+              <span class="irr-tag irr-tag-none">Rain expected</span>
+            </div>
+          </div>
+          <div class="irr-step">
+            <div class="irr-dot-col">
+              <div class="irr-dot" style="background:#38bdf8;box-shadow:0 0 0 2px #bae6fd"></div>
+              <div class="irr-line"></div>
+            </div>
+            <div class="irr-content">
+              <div class="irr-day">Day 3</div>
+              <div class="irr-action">💦 Light Irrigation</div>
+              <span class="irr-tag irr-tag-light">15mm water</span>
+            </div>
+          </div>
+          <div class="irr-step">
+            <div class="irr-dot-col">
+              <div class="irr-dot" style="background:#f59e0b;box-shadow:0 0 0 2px #fde68a"></div>
+              <div class="irr-line"></div>
+            </div>
+            <div class="irr-content">
+              <div class="irr-day">Day 5</div>
+              <div class="irr-action">🌿 Apply Fertilizer</div>
+              <span class="irr-tag irr-tag-fert">DAP + Urea mix</span>
+            </div>
+          </div>
+          <div class="irr-step">
+            <div class="irr-dot-col">
+              <div class="irr-dot" style="background:#1d4ed8;box-shadow:0 0 0 2px #93c5fd"></div>
+            </div>
+            <div class="irr-content">
+              <div class="irr-day">Day 8</div>
+              <div class="irr-action">💧 Deep Irrigation</div>
+              <span class="irr-tag irr-tag-deep">50mm water</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card" style="background:linear-gradient(135deg,#eff6ff,#dbeafe);border-color:#bfdbfe">
+          <div style="font-weight:700;color:#1e40af;margin-bottom:10px">💧 Water Savings</div>
+          <div style="font-size:2rem;font-weight:800;color:#1d4ed8">34%</div>
+          <div style="font-size:0.82rem;color:#3b82f6">vs. traditional flood irrigation</div>
+          <div class="conf-bar" style="margin-top:10px"><div class="conf-bar-fill" style="width:34%;background:#3b82f6"></div></div>
+        </div>
+        <div class="card">
+          <div style="font-weight:700;margin-bottom:12px">🌡 Soil Moisture Trend</div>
+          <svg style="width:100%;height:80px">
+            <polyline points="10,65 50,45 90,55 130,30 170,40 210,25 250,35" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"></polyline>
+            <polyline points="10,65 50,45 90,55 130,30 170,40 210,25 250,35 250,80 10,80" fill="rgba(34,197,94,0.1)" stroke="none"></polyline>
+          </svg>
+          <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--muted);margin-top:4px">
+            <span>Day 1</span><span>Day 3</span><span>Day 5</span><span>Day 8</span>
+          </div>
+        </div>
+        <div class="card" style="background:var(--green-bg);border-color:#bbf7d0">
+          <div style="font-size:0.82rem;color:var(--green-dark);font-weight:700">
+            💡 AI Tip: Based on 82% rain probability tomorrow, skip irrigation tonight and save ₹340 in water cost.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="pest">
+  <div class="container">
+    <div class="section-label">🐛 Pest Monitor</div>
+    <h2 class="section-title">Pest Risk Monitor</h2>
+    <p class="section-sub">Real-time pest detection and risk scoring using image analysis, weather correlation, and regional outbreak data.</p>
+    <div class="pest-layout">
+      <div>
+        <div class="pest-gauge">
+          <svg class="gauge-svg">
+            <circle class="gauge-track" cx="90" cy="90" r="80"></circle>
+            <circle class="gauge-fill" cx="90" cy="90" r="80"></circle>
+          </svg>
+          <div class="gauge-label">
+            <div class="gauge-title">🐛 Pest Risk</div>
+            <div class="gauge-val">18%</div>
+            <div class="gauge-level">● LOW</div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:12px;font-size:0.8rem;color:var(--muted)">Updated 15 min ago</div>
+      </div>
+      <div>
+        <div style="font-weight:700;margin-bottom:14px">📍 Nearby Pest Alerts</div>
+        <div class="pest-alerts">
+          <div class="pest-alert-row">
+            <div class="pest-name"><span class="pest-icon">🦟</span>Whitefly</div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+              <span class="pest-level level-low">Low</span>
+              <span style="font-size:0.75rem;color:var(--muted)">2 farms nearby</span>
+            </div>
+          </div>
+          <div class="pest-alert-row">
+            <div class="pest-name"><span class="pest-icon">🐛</span>Armyworm</div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+              <span class="pest-level level-none">None</span>
+              <span style="font-size:0.75rem;color:var(--muted)">No reports</span>
+            </div>
+          </div>
+          <div class="pest-alert-row">
+            <div class="pest-name"><span class="pest-icon">🌿</span>Stem Borer</div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+              <span class="pest-level level-medium">Medium</span>
+              <span style="font-size:0.75rem;color:var(--muted)">5 farms — 3 km away</span>
+            </div>
+          </div>
+          <div class="pest-alert-row">
+            <div class="pest-name"><span class="pest-icon">🦗</span>Leaf Hopper</div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+              <span class="pest-level level-low">Low</span>
+              <span style="font-size:0.75rem;color:var(--muted)">1 farm — 8 km away</span>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:16px;background:var(--green-bg);border-color:#bbf7d0">
+          <div style="font-weight:700;color:var(--green-dark);margin-bottom:8px">🛡 Preventive Actions</div>
+          <ul class="reco-list">
+            <li>Install yellow sticky traps for Whitefly monitoring</li>
+            <li>Apply Spinosad spray for Stem Borer prevention</li>
+            <li>Keep field edges weed-free</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="govt">
+  <div class="container">
+    <div class="section-label">🏛 Government RAG</div>
+    <h2 class="section-title">Government Advisory</h2>
+    <p class="section-sub">RAG-powered search over ICAR guidelines, PM Kisan, crop insurance, and Krishi Vigyan Kendra advisories.</p>
+    <div class="govt-search">
+      <input type="text" id="govt-search-input" placeholder="Search schemes, subsidies, guidelines…" />
+      <button class="btn btn-primary" id="govt-search-btn">🔍 Search</button>
+    </div>
+    <div class="scheme-tags" id="scheme-tags">
+      <span class="scheme-tag active" data-scheme="pm-kisan">PM Kisan</span>
+      <span class="scheme-tag" data-scheme="crop-insurance">Crop Insurance</span>
+      <span class="scheme-tag" data-scheme="subsidy">Subsidy</span>
+      <span class="scheme-tag" data-scheme="kcc">Kisan Credit Card</span>
+      <span class="scheme-tag" data-scheme="soil-card">Soil Health Card</span>
+      <span class="scheme-tag" data-scheme="icar">ICAR Guidelines</span>
+    </div>
+    <div class="govt-result">
+      <div class="govt-scheme-name">📋 PM Kisan Samman Nidhi</div>
+      <div class="govt-info-grid">
+        <div class="govt-info-item">
+          <div class="gi-label">Eligibility</div>
+          <div class="gi-val">✅ You Qualify</div>
+        </div>
+        <div class="govt-info-item">
+          <div class="gi-label">Annual Benefit</div>
+          <div class="gi-val">₹6,000 / year</div>
+        </div>
+        <div class="govt-info-item">
+          <div class="gi-label">Next Installment</div>
+          <div class="gi-val">₹2,000 — Aug 2025</div>
+        </div>
+        <div class="govt-info-item">
+          <div class="gi-label">Documents Required</div>
+          <div class="gi-val">Aadhaar · Land Records · Bank Passbook</div>
+        </div>
+        <div class="govt-info-item">
+          <div class="gi-label">Apply Online</div>
+          <div class="gi-val">pmkisan.gov.in</div>
+        </div>
+        <div class="govt-info-item">
+          <div class="gi-label">Status Check</div>
+          <div class="gi-val">Aadhaar-linked OTP</div>
+        </div>
+      </div>
+      <div style="margin-top:18px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:14px;font-size:0.85rem;color:rgba(255,255,255,0.7)">
+        <strong style="color:#86efac">🤖 AI Summary:</strong> As a 5-acre Cotton farmer in Ahmedabad, you are eligible for PM Kisan. Register your land records on the portal and link your Aadhaar for direct benefit transfer. Your next ₹2,000 installment is due in August 2025.
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="market">
+  <div class="container">
+    <div class="section-label">📈 Market Intelligence</div>
+    <h2 class="section-title">Crop Price Intelligence</h2>
+    <p class="section-sub">Live Agmarknet mandi prices with IBM Granite AI price trend forecasting and sell/hold recommendations.</p>
+    <div class="market-grid">
+      <div class="market-card">
+        <div class="market-crop">Cotton · Agmarknet</div>
+        <div class="market-price">₹7,420<span style="font-size:0.9rem;color:var(--muted);font-weight:400">/Qtl</span></div>
+        <div class="market-trend trend-up">↑ Rising +2.3%</div>
+        <div class="market-conf">
+          <div class="conf-text">AI Confidence: 91%</div>
+          <div class="conf-bar"><div class="conf-bar-fill" style="width:91%"></div></div>
+        </div>
+      </div>
+      <div class="market-card">
+        <div class="market-crop">Groundnut · Agmarknet</div>
+        <div class="market-price">₹6,120<span style="font-size:0.9rem;color:var(--muted);font-weight:400">/Qtl</span></div>
+        <div class="market-trend trend-down">↓ Falling -1.8%</div>
+        <div class="market-conf">
+          <div class="conf-text">AI Confidence: 78%</div>
+          <div class="conf-bar"><div class="conf-bar-fill" style="width:78%;background:#dc2626"></div></div>
+        </div>
+      </div>
+      <div class="market-card">
+        <div class="market-crop">Wheat · Agmarknet</div>
+        <div class="market-price">₹2,560<span style="font-size:0.9rem;color:var(--muted);font-weight:400">/Qtl</span></div>
+        <div class="market-trend trend-flat">→ Stable ±0.2%</div>
+        <div class="market-conf">
+          <div class="conf-text">AI Confidence: 85%</div>
+          <div class="conf-bar"><div class="conf-bar-fill" style="width:85%;background:#6b7280"></div></div>
+        </div>
+      </div>
+      <div class="market-card" style="background:var(--green-bg);border-color:#bbf7d0">
+        <div class="market-crop" style="color:var(--green)">Tomato · Local Mandi</div>
+        <div class="market-price" style="color:var(--green-dark)">₹1,840<span style="font-size:0.9rem;color:var(--muted);font-weight:400">/Qtl</span></div>
+        <div class="market-trend trend-up">↑ Seasonal Peak</div>
+        <div class="market-conf">
+          <div class="conf-text">AI Confidence: 88%</div>
+          <div class="conf-bar"><div class="conf-bar-fill" style="width:88%"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="market-reco-card">
+      <div>
+        <div class="mreco-crop">🌾 Cotton Recommendation</div>
+        <div class="mreco-action">Hold — Sell after 6 Days</div>
+      </div>
+      <div style="text-align:center">
+        <div class="mreco-label">Expected Price Increase</div>
+        <div class="mreco-val">+5.0%</div>
+        <div class="mreco-label" style="margin-top:4px">₹7,791/Qtl projected</div>
+      </div>
+      <div style="text-align:center">
+        <div class="mreco-label">Additional Profit (30 Qtl)</div>
+        <div class="mreco-val">+₹11,130</div>
+        <div class="mreco-label" style="margin-top:4px">by waiting 6 days</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="agents">
+  <div class="container">
+    <div class="section-label">🤝 IBM Orchestrate</div>
+    <h2 class="section-title">Multi-Agent AI Panel</h2>
+    <p class="section-sub">IBM Orchestrate coordinates four specialized agents — all running on IBM Granite — for holistic farm intelligence.</p>
+    <div class="agents-grid">
+      <div class="agent-card agent-crop">
+        <div class="agent-icon">🌱</div>
+        <div class="agent-name">Crop Advisory Agent</div>
+        <span class="agent-status status-active">Active</span>
+        <div class="agent-msg">Disease detected in field sector B. Recommendation ready. Confidence: 96%</div>
+      </div>
+      <div class="agent-card agent-weather">
+        <div class="agent-icon">☁</div>
+        <div class="agent-name">Weather Agent</div>
+        <span class="agent-status status-active">Active</span>
+        <div class="agent-msg">Forecast updated. Heavy rain expected tomorrow — irrigation hold advisory issued.</div>
+      </div>
+      <div class="agent-card agent-pest">
+        <div class="agent-icon">🐛</div>
+        <div class="agent-name">Pest Detection Agent</div>
+        <span class="agent-status status-active">Analyzing</span>
+        <div class="agent-msg">Leaf scan complete. Stem Borer risk elevated in 3 km radius. Spray advised.</div>
+      </div>
+      <div class="agent-card agent-market">
+        <div class="agent-icon">📈</div>
+        <div class="agent-name">Market Agent</div>
+        <span class="agent-status status-active">Updated</span>
+        <div class="agent-msg">Price prediction refreshed. Cotton hold signal — 5% increase expected in 6 days.</div>
+      </div>
+    </div>
+    
+    <div class="decision-card">
+      <div class="decision-header">
+        <span class="decision-badge">🤖 IBM Granite</span>
+        <div class="decision-title">Today's AI Decision Summary</div>
+      </div>
+      <ul class="decision-points">
+        <li>Rain expected tomorrow — do not irrigate today, save water and cost.</li>
+        <li>Apply DAP fertilizer 2 hours after tomorrow's rainfall for best absorption.</li>
+        <li>Monitor Leaf Blight on Cotton — apply Copper Oxychloride if symptoms spread.</li>
+        <li>Hold Cotton stock — sell after 6 days for projected ₹11,130 additional profit.</li>
+        <li>PM Kisan installment due August 2025 — verify Aadhaar linkage on portal.</li>
+      </ul>
+      <div class="decision-profit">
+        <div>
+          <div class="dp-label">Season Profit Estimate</div>
+          <div style="font-size:0.82rem;color:rgba(255,255,255,0.5)">5 Acres · Cotton · Kharif 2025</div>
+        </div>
+        <div class="dp-val">₹1.92 Lakhs</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="dashboard">
+  <div class="container">
+    <div class="section-label">📊 Farm Dashboard</div>
+    <h2 class="section-title">Farmer Dashboard</h2>
+    <p class="section-sub">Your complete farm performance overview — crop health, expenses, income and AI confidence in one place.</p>
+    <div class="dash-grid">
+      
+      <div class="dash-card">
+        <div class="dash-card-title">Crop Health Overview</div>
+        <div class="health-bar-wrap">
+          <div class="health-bar-label"><span>Overall Health</span><span style="color:var(--green);font-weight:700">92%</span></div>
+          <div class="health-bar"><div class="health-fill" style="width:92%"></div></div>
+        </div>
+        <div class="health-bar-wrap">
+          <div class="health-bar-label"><span>Disease Resistance</span><span>78%</span></div>
+          <div class="health-bar"><div class="health-fill" style="width:78%"></div></div>
+        </div>
+        <div class="health-bar-wrap">
+          <div class="health-bar-label"><span>Nutrient Level</span><span>85%</span></div>
+          <div class="health-bar"><div class="health-fill" style="width:85%"></div></div>
+        </div>
+        <div class="health-bar-wrap">
+          <div class="health-bar-label"><span>Water Efficiency</span><span>91%</span></div>
+          <div class="health-bar"><div class="health-fill" style="width:91%"></div></div>
+        </div>
+        <div class="health-bar-wrap">
+          <div class="health-bar-label"><span>Soil Quality</span><span>80%</span></div>
+          <div class="health-bar"><div class="health-fill" style="width:80%"></div></div>
+        </div>
+        
+        <div style="margin-top:16px">
+          <div style="font-size:0.75rem;color:var(--muted);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em">Yield Trend (6 Seasons)</div>
+          <svg style="width:100%;height:70px">
+            <polyline points="10,55 60,45 110,38 160,28 210,20 270,14" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round"></polyline>
+            <polyline points="10,55 60,45 110,38 160,28 210,20 270,14 270,70 10,70" fill="rgba(34,197,94,0.08)" stroke="none"></polyline>
+            <circle cx="270" cy="14" r="4" fill="var(--green)"></circle>
+          </svg>
+        </div>
+      </div>
+      
+      <div class="dash-card">
+        <div class="dash-card-title">Farm Expenses</div>
+        <div class="expense-row"><span>🌱 Seeds</span><span style="font-weight:700">₹18,000</span></div>
+        <div class="expense-row"><span>🧪 Fertilizer</span><span style="font-weight:700">₹12,000</span></div>
+        <div class="expense-row"><span>👷 Labour</span><span style="font-weight:700">₹25,000</span></div>
+        <div class="expense-row"><span>💧 Irrigation</span><span style="font-weight:700">₹8,000</span></div>
+        <div class="expense-row"><span>🚜 Equipment</span><span style="font-weight:700">₹6,000</span></div>
+        <div class="expense-row" style="border-top:2px solid var(--border);margin-top:4px;padding-top:12px">
+          <span style="font-weight:700">Total</span>
+          <span style="font-weight:800;color:var(--text);font-size:1.05rem">₹69,000</span>
+        </div>
+        
+        <!-- donut: Seeds 26%, Fertilizer 17%, Labour 36%, Irrigation 12%, Equipment 9% -->
+        <svg style="width:100px;height:100px;margin:16px auto;display:block" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#e5e7eb" stroke-width="14"></circle>
+          <!-- Seeds 26% → 59.7 of 238.76 -->
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#22c55e" stroke-width="14"
+            stroke-dasharray="59.7 179.1" stroke-dashoffset="0" transform="rotate(-90 50 50)"></circle>
+          <!-- Fertilizer 17% → 40.6 -->
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#3b82f6" stroke-width="14"
+            stroke-dasharray="40.6 198.2" stroke-dashoffset="-59.7" transform="rotate(-90 50 50)"></circle>
+          <!-- Labour 36% → 85.95 -->
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#f59e0b" stroke-width="14"
+            stroke-dasharray="85.95 152.8" stroke-dashoffset="-100.3" transform="rotate(-90 50 50)"></circle>
+          <!-- Irrigation 12% → 28.65 -->
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#38bdf8" stroke-width="14"
+            stroke-dasharray="28.65 210.1" stroke-dashoffset="-186.3" transform="rotate(-90 50 50)"></circle>
+          <!-- Equipment 9% → 21.5 -->
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#a78bfa" stroke-width="14"
+            stroke-dasharray="21.5 217.3" stroke-dashoffset="-214.9" transform="rotate(-90 50 50)"></circle>
+          <text x="50" y="55" text-anchor="middle" font-size="11" font-weight="700" fill="#1f2328">Costs</text>
+        </svg>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;justify-content:center;font-size:0.72rem">
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:#22c55e;display:inline-block"></span>Seeds</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:#3b82f6;display:inline-block"></span>Fertilizer</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:#f59e0b;display:inline-block"></span>Labour</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:#38bdf8;display:inline-block"></span>Irrigation</span>
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:#a78bfa;display:inline-block"></span>Equipment</span>
+        </div>
+      </div>
+      
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="kpi-card">
+          <div class="kpi-val" style="color:var(--green)">₹1,92,000</div>
+          <div class="kpi-label">Expected Income</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-val" style="color:var(--blue)">97%</div>
+          <div class="kpi-label">AI Confidence</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-val" style="color:var(--purple)">₹1,23,000</div>
+          <div class="kpi-label">Net Profit Estimate</div>
+        </div>
+        <div class="kpi-card" style="background:var(--green-bg);border-color:#bbf7d0">
+          <div class="kpi-val" style="color:var(--green)">178%</div>
+          <div class="kpi-label">Return on Investment</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="ibm">
+  <div class="container">
+    <div class="section-label ibm-label">⚡ IBM AI Stack</div>
+    <h2 class="section-title ibm-title">Powered by IBM AI</h2>
+    <p class="section-sub ibm-sub">AgriSense AI is built on enterprise-grade IBM AI infrastructure — production-ready, scalable, and trusted.</p>
+    <div class="ibm-grid">
+      <div class="ibm-card">
+        <div class="ibm-card-icon">🧠</div>
+        <div class="ibm-card-name">IBM Granite</div>
+        <div class="ibm-card-desc">Foundation model reasoning engine for crop advisory, disease diagnosis, and market prediction</div>
+      </div>
+      <div class="ibm-card">
+        <div class="ibm-card-icon">🔗</div>
+        <div class="ibm-card-name">IBM Langflow</div>
+        <div class="ibm-card-desc">Visual agent workflow orchestration — connects data sources, models, and output channels</div>
+      </div>
+      <div class="ibm-card">
+        <div class="ibm-card-icon">🤝</div>
+        <div class="ibm-card-name">IBM Orchestrate</div>
+        <div class="ibm-card-desc">Multi-agent coordination layer that synchronizes Crop, Weather, Pest, and Market agents</div>
+      </div>
+      <div class="ibm-card">
+        <div class="ibm-card-icon">🌐</div>
+        <div class="ibm-card-name">Watsonx.ai</div>
+        <div class="ibm-card-desc">Unified AI platform for model training, fine-tuning, and deployment at farm scale</div>
+      </div>
+      <div class="ibm-card">
+        <div class="ibm-card-icon">📚</div>
+        <div class="ibm-card-name">RAG Engine</div>
+        <div class="ibm-card-desc">Retrieval over ICAR PDFs, KVK advisories, and government scheme databases</div>
+      </div>
+    </div>
+    
+    <div class="workflow-strip">
+      <div class="wf-step"><div class="wf-icon">👨‍🌾</div><div class="wf-label">Farmer</div></div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-step"><div class="wf-icon">💬</div><div class="wf-label">AI Assistant</div></div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-step"><div class="wf-icon">🤝</div><div class="wf-label">IBM Orchestrate</div></div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-step"><div class="wf-icon">🌱</div><div class="wf-label">Crop Agent</div></div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-step"><div class="wf-icon">☁</div><div class="wf-label">Weather Agent</div></div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-step"><div class="wf-icon">🐛</div><div class="wf-label">Pest Agent</div></div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-step"><div class="wf-icon">📈</div><div class="wf-label">Market Agent</div></div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-step"><div class="wf-icon">🧠</div><div class="wf-label">IBM Granite</div></div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-step"><div class="wf-icon">📋</div><div class="wf-label">Recommendation</div></div>
+      <div class="wf-arrow">→</div>
+      <div class="wf-step"><div class="wf-icon">📊</div><div class="wf-label">Dashboard</div></div>
+    </div>
+  </div>
+</section>
+
+
+<section id="tech">
+  <div class="container">
+    <div class="section-label">🛠 Tech Stack</div>
+    <h2 class="section-title">Technology Stack</h2>
+    <p class="section-sub">Production-grade technologies chosen for reliability, scalability, and AI-first architecture.</p>
+    <div class="tech-cols">
+      <div class="tech-col">
+        <div class="tech-col-title">Frontend</div>
+        <span class="tech-pill">Next.js</span>
+        <span class="tech-pill">React</span>
+        <span class="tech-pill">Tailwind CSS</span>
+        <span class="tech-pill">Framer Motion</span>
+        <span class="tech-pill">ShadCN UI</span>
+        <span class="tech-pill">Chart.js</span>
+      </div>
+      <div class="tech-col">
+        <div class="tech-col-title">Backend</div>
+        <span class="tech-pill">Node.js</span>
+        <span class="tech-pill">Express.js</span>
+        <span class="tech-pill">Python</span>
+        <span class="tech-pill">FastAPI</span>
+      </div>
+      <div class="tech-col">
+        <div class="tech-col-title">AI / IBM</div>
+        <span class="tech-pill">IBM Granite</span>
+        <span class="tech-pill">IBM Langflow</span>
+        <span class="tech-pill">IBM Orchestrate</span>
+        <span class="tech-pill">Watsonx.ai</span>
+      </div>
+      <div class="tech-col">
+        <div class="tech-col-title">Data &amp; APIs</div>
+        <span class="tech-pill">MongoDB Atlas</span>
+        <span class="tech-pill">OpenWeather API</span>
+        <span class="tech-pill">SoilGrids</span>
+        <span class="tech-pill">Agmarknet</span>
+        <span class="tech-pill">Watson Discovery</span>
+      </div>
+      <div class="tech-col">
+        <div class="tech-col-title">Vision &amp; RAG</div>
+        <span class="tech-pill">PlantVillage</span>
+        <span class="tech-pill">IBM Vision AI</span>
+        <span class="tech-pill">Vector DB</span>
+        <span class="tech-pill">ICAR PDFs</span>
+        <span class="tech-pill">KVK Data</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<div id="toast-bar" style="position:fixed;bottom:-64px;left:50%;transform:translateX(-50%);background:#052e16;color:#86efac;border:1px solid #16a34a;padding:12px 24px;border-radius:12px;font-size:0.88rem;font-weight:600;z-index:9999;transition:bottom 0.35s ease;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.25)"></div>
+
+<footer>
+  <div style="margin-bottom:10px">
+    <strong style="color:var(--green)">🌾 AgriSense AI</strong> — Smart Farming powered by IBM Granite · Langflow · Orchestrate · Watsonx.ai
+  </div>
+  <div style="margin-bottom:8px;color:var(--muted)">
+    Built for IBM Hackathon · Problem Statement 14 · Smart Agriculture AI Platform
+  </div>
+  <div>
+    <a href="#hero">Home</a>  · 
+    <a href="#ai-advisor">AI Advisor</a>  · 
+    <a href="#weather">Weather</a>  · 
+    <a href="#market">Market</a>  · 
+    <a href="#ibm">IBM AI</a>
+  </div>
+  <div style="border-top:1px solid var(--border);margin-top:20px;padding-top:14px;font-size:0.72rem;color:#9ca3af">
+    Made with IBM Bob
+  </div>
+</footer>
+
+
+
+<script>
+/* ── CROP ROWS ── */
+(function(){
+  const container = document.getElementById('cropRows');
+  for(let i=0;i<60;i++){
+    const stalk = document.createElement('div');
+    stalk.className = 'crop-stalk';
+    stalk.innerHTML = '<div class="stalk-body"></div><div class="stalk-top"></div>';
+    container.appendChild(stalk);
+  }
+})();
+
+/* ── PARTICLES ── */
+(function(){
+  const container = document.getElementById('particles');
+  const colors = ['#22c55e','#86efac','#4ade80','#bbf7d0'];
+  for(let i=0;i<18;i++){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.cssText = `left:${Math.random()*100}%;bottom:${80+Math.random()*120}px;
+      width:${4+Math.random()*5}px;height:${4+Math.random()*5}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-delay:${Math.random()*4}s;animation-duration:${3+Math.random()*3}s;`;
+    container.appendChild(p);
+  }
+})();
+
+/* ── HAMBURGER ── */
+document.getElementById('hamburger-btn').addEventListener('click',function(){
+  const nav = document.getElementById('nav-links');
+  nav.classList.toggle('open');
+  const spans = this.querySelectorAll('span');
+  if(nav.classList.contains('open')){
+    spans[0].style.transform='rotate(45deg) translate(5px,5px)';
+    spans[1].style.opacity='0';
+    spans[2].style.transform='rotate(-45deg) translate(5px,-5px)';
+  } else {
+    spans[0].style.transform='';spans[1].style.opacity='';spans[2].style.transform='';
+  }
+});
+document.querySelectorAll('#nav-links a').forEach(a=>{
+  a.addEventListener('click',()=>{
+    document.getElementById('nav-links').classList.remove('open');
+    const btn = document.getElementById('hamburger-btn');
+    btn.querySelectorAll('span').forEach(s=>{s.style.transform='';s.style.opacity='';});
+  });
+});
+
+/* ── HERO STAT COUNTER ── */
+function animateValue(el, target, duration, suffix){
+  const start = performance.now();
+  const frame = (now)=>{
+    const p = Math.min((now-start)/duration,1);
+    const val = Math.floor(p*target);
+    el.textContent = val + suffix;
+    if(p<1) requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+}
+const heroStats = [
+  {el:null, target:50000, suffix:'K+', display:'50K+'},
+  {el:null, target:97, suffix:'%', display:'97%'},
+  {el:null, target:28, suffix:'+', display:'28+'},
+  {el:null, target:2.4, suffix:'Cr', display:'₹2.4Cr', currency:true},
+];
+const heroStatEls = document.querySelectorAll('.hero-stat .val');
+let heroAnimated = false;
+const heroObs = new IntersectionObserver(entries=>{
+  if(entries[0].isIntersecting && !heroAnimated){
+    heroAnimated = true;
+    heroStatEls.forEach((el,i)=>{
+      if(i===0) animateValue(el,50,1400,'K+');
+      else if(i===1) animateValue(el,97,1600,'%');
+      else if(i===2) animateValue(el,28,1200,'+');
+      else { setTimeout(()=>{ el.textContent='₹2.4Cr'; },900); }
+    });
+    heroObs.disconnect();
+  }
+},{threshold:0.5});
+if(heroStatEls.length) heroObs.observe(heroStatEls[0].closest('.hero-stats'));
+
+/* ── SCROLL REVEAL ── */
+document.querySelectorAll('section > .container, section > .hero-content').forEach(el=>{
+  el.classList.add('reveal');
+});
+const revealObs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); revealObs.unobserve(e.target); } });
+},{threshold:0.08});
+document.querySelectorAll('.reveal').forEach(el=>revealObs.observe(el));
+
+/* ── TOAST ── */
+function showToast(msg){
+  const t = document.getElementById('toast-bar');
+  t.textContent = msg;
+  t.style.bottom = '24px';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>{ t.style.bottom = '-64px'; }, 3000);
+}
+
+/* ── AI CHAT ── */
+const chatBody = document.querySelector('.chat-body');
+const chatInput = document.getElementById('chat-input');
+const chatSend  = document.getElementById('chat-send');
+
+const aiResponses = {
+  harvest: "🌾 <strong>Cotton Harvest Timing:</strong> Based on your crop stage (Day 78) and weather forecast, optimal harvest window is <strong>22–28 days away</strong>. Watch for boll opening ≥ 60%. Avoid harvesting on rainy days — aim for early morning with humidity &lt; 65%.",
+  fertilizer: "🧪 <strong>Top Fertilizers for Cotton:</strong><br>• DAP @ 100 kg/acre at sowing<br>• Urea @ 60 kg/acre at 30 DAS<br>• MOP @ 50 kg/acre at boll formation<br>• Micronutrient mix (Zinc Sulphate) @ 10 kg/acre<br><br>⚠️ Avoid applying on waterlogged soil.",
+  pest: "🛡 <strong>Pest Prevention Plan:</strong><br>• Install yellow sticky traps (10/acre)<br>• Apply Neem Oil (5ml/L) spray weekly<br>• Release Trichogramma cards for bollworm<br>• Monitor with pheromone traps<br><br>Current risk is <strong>LOW (18%)</strong> — maintain preventive measures.",
+  pm_kisan: "🏛 <strong>PM Kisan Status:</strong> You are eligible! As a 5-acre Cotton farmer in Ahmedabad:<br>• Annual benefit: <strong>₹6,000</strong> (3 instalments of ₹2,000)<br>• Next instalment: August 2025<br>• Register at: pmkisan.gov.in<br>• Link Aadhaar to your bank account for direct transfer.",
+  default: "🤖 <strong>AgriSense AI:</strong> Great question! Based on your farm profile (5 acres, Cotton, Kharif 2025) and current sensor data, I recommend checking the <strong>Soil Health</strong> section for nutrient levels and the <strong>Weather Dashboard</strong> for irrigation timing. Want me to run a full farm diagnostic?"
+};
+
+function appendMsg(role, html){
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  div.innerHTML = `<div class="msg-avatar">${role==='user'?'👨‍🌾':'🤖'}</div><div class="msg-bubble">${html}</div>`;
+  chatBody.appendChild(div);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+function showTyping(){
+  const t = document.createElement('div');
+  t.className = 'msg bot'; t.id = 'typing-indicator';
+  t.innerHTML = '<div class="msg-avatar">🤖</div><div class="msg-bubble"><div class="typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>';
+  chatBody.appendChild(t);
+  chatBody.scrollTop = chatBody.scrollHeight;
+  return t;
+}
+function removeTyping(el){ if(el && el.parentNode) el.parentNode.removeChild(el); }
+
+function getAIResponse(q){
+  const lower = q.toLowerCase();
+  if(lower.includes('harvest')) return aiResponses.harvest;
+  if(lower.includes('fertilizer')||lower.includes('fertiliser')||lower.includes('dap')||lower.includes('urea')) return aiResponses.fertilizer;
+  if(lower.includes('pest')||lower.includes('insect')||lower.includes('bug')) return aiResponses.pest;
+  if(lower.includes('pm kisan')||lower.includes('scheme')||lower.includes('government')||lower.includes('subsidy')) return aiResponses.pm_kisan;
+  return aiResponses.default;
+}
+
+function sendMessage(text){
+  const q = (text || chatInput.value).trim();
+  if(!q) return;
+  appendMsg('user', q);
+  chatInput.value = '';
+  const typing = showTyping();
+  setTimeout(()=>{ removeTyping(typing); appendMsg('bot', getAIResponse(q)); }, 1400);
+}
+chatSend.addEventListener('click', ()=>sendMessage());
+chatInput.addEventListener('keydown', e=>{ if(e.key==='Enter') sendMessage(); });
+
+// Quick chips
+document.querySelectorAll('.chip').forEach(chip=>{
+  chip.addEventListener('click',()=>sendMessage(chip.textContent.trim()));
+});
+
+/* ── GOVT SCHEME FILTER ── */
+const schemes = {
+  'pm-kisan': {
+    name: '📋 PM Kisan Samman Nidhi',
+    items: [
+      {label:'Eligibility', val:'✅ You Qualify'},
+      {label:'Annual Benefit', val:'₹6,000 / year'},
+      {label:'Next Installment', val:'₹2,000 — Aug 2025'},
+      {label:'Documents Required', val:'Aadhaar · Land Records · Bank Passbook'},
+      {label:'Apply Online', val:'pmkisan.gov.in'},
+      {label:'Status Check', val:'Aadhaar-linked OTP'},
+    ],
+    summary: 'As a 5-acre Cotton farmer in Ahmedabad, you are eligible for PM Kisan. Register your land records on the portal and link your Aadhaar for direct benefit transfer. Your next ₹2,000 installment is due in August 2025.'
+  },
+  'crop-insurance': {
+    name: '🛡 Pradhan Mantri Fasal Bima Yojana',
+    items: [
+      {label:'Eligibility', val:'✅ You Qualify'},
+      {label:'Premium (Cotton)', val:'2% of Sum Insured'},
+      {label:'Sum Insured', val:'Up to ₹50,000/acre'},
+      {label:'Claim Trigger', val:'≥25% yield loss'},
+      {label:'Apply Via', val:'Bank / CSC Center'},
+      {label:'Last Date', val:'10 Days before Sowing'},
+    ],
+    summary: 'Enroll in PMFBY for Cotton crop insurance. Premium is only 2% of the insured amount — for 5 acres you pay ~₹5,000 and are covered up to ₹2.5 Lakhs against drought, flood, pest outbreaks, and natural disasters.'
+  },
+  'subsidy': {
+    name: '💰 Agricultural Input Subsidy',
+    items: [
+      {label:'Fertilizer Subsidy', val:'Up to 25% on DAP/Urea'},
+      {label:'Drip Irrigation', val:'55–90% subsidy'},
+      {label:'Solar Pump', val:'Up to 75% subsidy'},
+      {label:'Seed Mini-Kit', val:'Free Bt Cotton seeds'},
+      {label:'Apply At', val:'District Agri Office'},
+      {label:'Documents', val:'Land Record + Aadhaar'},
+    ],
+    summary: 'Multiple input subsidies are available for Cotton farmers. The drip irrigation subsidy (55-90%) alone can save ₹40,000+ on a 5-acre setup. Apply at your district agriculture office with land records.'
+  },
+  'kcc': {
+    name: '💳 Kisan Credit Card',
+    items: [
+      {label:'Credit Limit', val:'Up to ₹3 Lakh'},
+      {label:'Interest Rate', val:'4% per annum (subsidized)'},
+      {label:'Repayment', val:'Flexible — post-harvest'},
+      {label:'Apply At', val:'Any Nationalized Bank'},
+      {label:'Collateral', val:'Not required below ₹1.6L'},
+      {label:'Renewal', val:'Annual (on repayment)'},
+    ],
+    summary: 'A Kisan Credit Card offers revolving credit at just 4% interest — significantly lower than market rates of 14-18%. For a 5-acre Cotton farm, a KCC limit of ₹1.5 Lakh covers all input costs comfortably.'
+  },
+  'soil-card': {
+    name: '🌱 Soil Health Card Scheme',
+    items: [
+      {label:'Status', val:'✅ Card Available'},
+      {label:'Tests Covered', val:'12 Soil Parameters'},
+      {label:'Frequency', val:'Every 2 Years'},
+      {label:'Cost', val:'Free of Charge'},
+      {label:'Issued By', val:'KVK / Agriculture Dept.'},
+      {label:'Fertilizer Saving', val:'10–15% estimated'},
+    ],
+    summary: 'Your Soil Health Card shows Phosphorus is low and Potassium is high — apply DAP to correct P deficiency and reduce Urea. Regular SHC testing every 2 years can reduce fertilizer costs by 10-15%, saving ₹3,000–₹5,000 per season.'
+  },
+  'icar': {
+    name: '📚 ICAR Crop Advisory',
+    items: [
+      {label:'Crop', val:'Cotton (Gossypium hirsutum)'},
+      {label:'Variety Recommended', val:'Bt Hybrid (BG-II)'},
+      {label:'Sowing Window', val:'June 1 – July 15'},
+      {label:'Seed Rate', val:'2.5 kg/acre'},
+      {label:'Row Spacing', val:'90 × 60 cm'},
+      {label:'Critical Irrigation', val:'Boll Formation Stage'},
+    ],
+    summary: 'ICAR recommends Bt Cotton Hybrid BG-II for your black soil in Ahmedabad. Sow between June-July, maintain 90×60 cm spacing for optimal yield. Critical irrigation at boll formation (75-90 DAS) can increase yield by 20-25%.'
+  }
+};
+
+function renderGovtScheme(key){
+  const scheme = schemes[key] || schemes['pm-kisan'];
+  const result = document.querySelector('.govt-result');
+  result.innerHTML = `
+    <div class="govt-scheme-name">${scheme.name}</div>
+    <div class="govt-info-grid">
+      ${scheme.items.map(i=>`
+        <div class="govt-info-item">
+          <div class="gi-label">${i.label}</div>
+          <div class="gi-val">${i.val}</div>
+        </div>`).join('')}
+    </div>
+    <div style="margin-top:18px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:14px;font-size:0.85rem;color:rgba(255,255,255,0.7)">
+      <strong style="color:#86efac">🤖 AI Summary:</strong> ${scheme.summary}
+    </div>`;
+}
+
+document.querySelectorAll('.scheme-tag').forEach(tag=>{
+  tag.addEventListener('click',function(){
+    document.querySelectorAll('.scheme-tag').forEach(t=>t.classList.remove('active'));
+    this.classList.add('active');
+    renderGovtScheme(this.dataset.scheme);
+  });
+});
+document.getElementById('govt-search-btn').addEventListener('click',function(){
+  const val = document.getElementById('govt-search-input').value.trim().toLowerCase();
+  if(!val) return;
+  let matched = 'pm-kisan';
+  if(val.includes('insurance')||val.includes('fasal')) matched='crop-insurance';
+  else if(val.includes('subsid')||val.includes('drip')||val.includes('solar')) matched='subsidy';
+  else if(val.includes('credit')||val.includes('kcc')||val.includes('loan')) matched='kcc';
+  else if(val.includes('soil')||val.includes('health')) matched='soil-card';
+  else if(val.includes('icar')||val.includes('advisory')||val.includes('cotton')) matched='icar';
+  document.querySelectorAll('.scheme-tag').forEach(t=>{
+    t.classList.toggle('active', t.dataset.scheme===matched);
+  });
+  renderGovtScheme(matched);
+  showToast('Showing results for: ' + val);
+});
+document.getElementById('govt-search-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter') document.getElementById('govt-search-btn').click();
+});
+
+/* ── GENERATE FARM PLAN ── */
+const planOutputs = {
+  Cotton:  {seed:'Bt Cotton Hybrid BG-II', yield:'30 Quintals', days:118, profit:'₹1,92,000', risk:'🟢 Low'},
+  Wheat:   {seed:'HD-2967 Variety', yield:'22 Quintals', days:125, profit:'₹85,000', risk:'🟢 Low'},
+  Tomato:  {seed:'Hybrid Indeterminate', yield:'180 Quintals', days:75, profit:'₹2,40,000', risk:'🟡 Medium'},
+};
+document.getElementById('gen-plan-btn').addEventListener('click',function(){
+  const btn = this;
+  const crop = document.querySelector('#advisor select').value || 'Cotton';
+  btn.textContent = '⏳ Generating…';
+  btn.disabled = true;
+  setTimeout(()=>{
+    const p = planOutputs[crop] || planOutputs.Cotton;
+    const cards = document.querySelectorAll('#advisor .output-cards > div');
+    if(cards.length>=4){
+      cards[0].querySelector('div:last-child').textContent = p.seed;
+      cards[1].querySelector('div:last-child').textContent = p.yield;
+      cards[2].querySelector('div:last-child').textContent = p.days + ' Days';
+      cards[3].querySelector('div:last-child').textContent = p.profit;
+    }
+    const riskEl = document.querySelector('#advisor [style*="Risk Level"]');
+    if(riskEl) riskEl.nextElementSibling && (riskEl.nextElementSibling.textContent = p.risk);
+    showToast('✅ AI Farm Plan generated for ' + crop);
+    btn.textContent = '✅ Plan Generated';
+    btn.disabled = false;
+  }, 2000);
+});
+
+/* ── UPLOAD ZONE INTERACTION ── */
+document.getElementById('choose-image-btn').addEventListener('click',()=>document.getElementById('file-input').click());
+document.getElementById('file-input').addEventListener('change',function(){
+  if(!this.files[0]) return;
+  const icon = document.getElementById('upload-icon');
+  icon.textContent = '⏳';
+  setTimeout(()=>{ icon.textContent='🔬'; showToast('✅ Image analyzed — Leaf Blight detected (95% confidence)'); },1800);
+});
+const zone = document.getElementById('upload-zone');
+zone.addEventListener('dragover',e=>{ e.preventDefault(); zone.style.borderColor='#22c55e'; zone.style.background='#dcfce7'; });
+zone.addEventListener('dragleave',()=>{ zone.style.borderColor=''; zone.style.background=''; });
+zone.addEventListener('drop',e=>{
+  e.preventDefault(); zone.style.borderColor=''; zone.style.background='';
+  document.getElementById('upload-icon').textContent='⏳';
+  setTimeout(()=>{ document.getElementById('upload-icon').textContent='🔬'; showToast('✅ Image analyzed — Leaf Blight detected (95% confidence)'); },1800);
+});
+
+/* ── SCHEME TAGS clickable (market strip) ── */
+document.querySelectorAll('.market-card').forEach(card=>{
+  card.style.cursor='pointer';
+  card.addEventListener('click',()=>{
+    const crop = card.querySelector('.market-crop').textContent.split('·')[0].trim();
+    showToast('📊 Loading full price history for '+crop+'…');
+  });
+});
+</script>
+
+</body>
+</html>
